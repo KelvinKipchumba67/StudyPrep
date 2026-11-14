@@ -22,18 +22,18 @@ export default function StudyForm({
     setError("");
 
     onPlanGenerated(null);
+
     const fd = new FormData(e.currentTarget);
-    const plan = JSON.stringify({
-      subject: fd.get("subject"),
-      topics: fd.get("topics"),
-      examDate: fd.get("examDate"),
-    });
+    const subject = fd.get("subject") as string;
+    const topics = fd.get("topics") as string;
+    const examDate = fd.get("examDate") as string;
+
     try {
       const generateRes = await fetch("/api/generate", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ subject, topics, examDate }),
       });
 
       const generateData = await generateRes.json();
@@ -45,9 +45,9 @@ export default function StudyForm({
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          subject: fd.get("subject"),
-          topics: fd.get("topics"),
-          examDate: fd.get("examDate"),
+          subject,
+          topics,
+          examDate,
           schedule: generatedSchedule,
         }),
       });
@@ -55,7 +55,7 @@ export default function StudyForm({
       if (!saveRes.ok) {
         const saveData = await saveRes.json().catch(() => ({}));
         throw new Error(
-            saveData.error || "Plan generated, but failed to save to database.",
+            saveData.error || "Plan generated, but failed to save to database."
         );
       }
       const saveData = await saveRes.json().catch(() => ({}));
@@ -105,7 +105,13 @@ export default function StudyForm({
             <label className="mb-1.5 block text-sm font-medium text-slate-700">
               Exam Date
             </label>
-            <input type="date" name="examDate" required className={inputClass} />
+            <input
+                type="date"
+                name="examDate"
+                required
+                min={new Date().toLocaleDateString("en-CA")}
+                className={inputClass}
+            />
           </div>
 
           <button
