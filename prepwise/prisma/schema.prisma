@@ -25,3 +25,14 @@ model StudyPlan {
   schedule  Json
   createdAt DateTime @default(now())
 }
+
+model FlashcardDeck {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  subject   String
+  cards     Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
