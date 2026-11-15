@@ -62,13 +62,13 @@ export default function AboutSection({
                         </Link>
                     )}
                     <span className="inline-block w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-800">
-            About Prep
+            About StudyPrep
           </span>
                     <h2 className="mt-5 text-5xl font-extrabold leading-tight tracking-tight text-[#0B2410] md:text-6xl">
                         Your study partner
                     </h2>
                     <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
-                        PrepWise is an AI-powered study planner that helps students build
+                        StudyPrep is an AI-powered study planner that helps students build flashcards and
                         personalized revision schedules based on their subject, topics, and
                         exam date.
                     </p>
