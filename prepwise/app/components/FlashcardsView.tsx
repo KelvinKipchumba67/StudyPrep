@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { SquareStack, LayoutGrid, Sparkles, ChevronDown, Search, Trash2 } from "lucide-react";
 import MobileNav from "@/app/components/MobileNav";
+import ConfirmDialog from "@/app/components/ConfirmDialog";
 
 type Card = { front: string; back: string };
 export type Deck = {
@@ -15,23 +16,42 @@ export type Deck = {
 const inputClass =
     "w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-blue-500 focus:bg-white";
 
-function FlipCard({ card, index }: { card: Card; index: number }) {
+function FlipCard({
+                      card,
+                      index,
+                      onDelete,
+                  }: {
+    card: Card;
+    index: number;
+    onDelete: () => void;
+}) {
     const [flipped, setFlipped] = useState(false);
     return (
-        <button
-            type="button"
-            onClick={() => setFlipped((f) => !f)}
-            className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition hover:border-blue-300"
-        >
+        <div className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-blue-300">
             <div className="flex items-center justify-between gap-2 border-b border-slate-200 bg-slate-50/70 px-5 py-3">
                 <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
                     Card {index + 1}
                 </span>
-                <span className="text-xs text-slate-500">
-                    {flipped ? "Answer" : "Question"} · tap to flip
-                </span>
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500">
+                        {flipped ? "Answer" : "Question"}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={onDelete}
+                        aria-label="Delete card"
+                        style={{ padding: 4 }}
+                        className="rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                </div>
             </div>
-            <div className="min-h-[96px] p-5">
+            <button
+                type="button"
+                onClick={() => setFlipped((f) => !f)}
+                className="min-h-[96px] p-5 text-left"
+            >
                 <p
                     className={`break-words text-sm ${
                         flipped ? "text-slate-600" : "font-semibold text-slate-900"
@@ -39,8 +59,9 @@ function FlipCard({ card, index }: { card: Card; index: number }) {
                 >
                     {flipped ? card.back : card.front}
                 </p>
-            </div>
-        </button>
+                <span className="mt-3 block text-xs text-slate-400">Tap to flip</span>
+            </button>
+        </div>
     );
 }
 
@@ -50,20 +71,24 @@ function DeckSection({
                          defaultOpen,
                          searching,
                          onDelete,
+                         onDeleteCard,
                      }: {
     deck: Deck;
     cards: { card: Card; index: number }[];
     defaultOpen: boolean;
     searching: boolean;
     onDelete: () => void;
+    onDeleteCard: (index: number) => void;
 }) {
     const [open, setOpen] = useState(defaultOpen);
-    const isOpen = open || searching; // always expanded while searching
+    const isOpen = open || searching;
 
     return (
         <div className="min-w-0 space-y-4">
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-white pr-4"
-                 style={{ paddingRight: 20 }}>
+            <div
+                className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-white"
+                style={{ paddingRight: 20 }}
+            >
                 <button
                     type="button"
                     onClick={() => setOpen((o) => !o)}
@@ -99,7 +124,12 @@ function DeckSection({
             {isOpen && (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {cards.map(({ card, index }) => (
-                        <FlipCard key={index} card={card} index={index} />
+                        <FlipCard
+                            key={index}
+                            card={card}
+                            index={index}
+                            onDelete={() => onDeleteCard(index)}
+                        />
                     ))}
                 </div>
             )}
@@ -203,6 +233,8 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
     const [decks, setDecks] = useState<Deck[]>(initialDecks);
     const [today, setToday] = useState("");
     const [query, setQuery] = useState("");
+    const [deckToDelete, setDeckToDelete] = useState<Deck | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         setToday(
@@ -216,22 +248,48 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
 
     const subjectCount = new Set(decks.map((d) => d.subject.trim().toLowerCase())).size;
 
-
-    const handleDeleteDeck = async (id: string) => {
-        if (!window.confirm("Delete this deck and all its cards? This can't be undone.")) return;
+    const confirmDeleteDeck = async () => {
+        if (!deckToDelete) return;
+        setDeleting(true);
 
         try {
-            const res = await fetch(`/api/flashcards/${id}`, {
+            const res = await fetch(`/api/flashcards/${deckToDelete.id}`, {
                 method: "DELETE",
                 credentials: "include",
             });
             if (!res.ok) throw new Error();
-            setDecks((prev) => prev.filter((d) => d.id !== id));
+
+            setDecks((prev) => prev.filter((d) => d.id !== deckToDelete.id));
+            setDeckToDelete(null);
         } catch {
             alert("Couldn't delete the deck. Please try again.");
+        } finally {
+            setDeleting(false);
         }
     };
 
+    const handleDeleteCard = async (deckId: string, index: number) => {
+        try {
+            const res = await fetch(`/api/flashcards/${deckId}`, {
+                method: "PATCH",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ removeIndex: index }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            if (data.deckDeleted) {
+                setDecks((prev) => prev.filter((d) => d.id !== deckId));
+            } else {
+                setDecks((prev) =>
+                    prev.map((d) => (d.id === deckId ? { ...d, cards: data.cards } : d))
+                );
+            }
+        } catch {
+            alert("Couldn't delete the card. Please try again.");
+        }
+    };
 
     const q = query.trim().toLowerCase();
     const visibleDecks = decks
@@ -314,12 +372,25 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
                                 cards={cards}
                                 defaultOpen={i === 0}
                                 searching={q !== ""}
-                                onDelete={() => handleDeleteDeck(deck.id)}
+                                onDelete={() => setDeckToDelete(deck)}
+                                onDeleteCard={(index) => handleDeleteCard(deck.id, index)}
                             />
                         ))
                     )}
                 </div>
             </div>
+
+            <ConfirmDialog
+                open={!!deckToDelete}
+                title="Delete flashcard deck"
+                description={`This will permanently delete "${deckToDelete?.title ?? ""}" and all its cards.`}
+                confirmWord="delete"
+                warning="This cannot be undone."
+                loading={deleting}
+                onCancel={() => setDeckToDelete(null)}
+                onConfirm={confirmDeleteDeck}
+            />
+
             <MobileNav />
         </div>
     );
