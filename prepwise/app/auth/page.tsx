@@ -56,10 +56,10 @@ export default function AuthPage() {
       <div className="flex w-full flex-col justify-center px-8 md:w-1/2 md:px-16 lg:px-24">
           <div className="absolute left-8 top-8 flex items-center gap-3 md:left-16 lg:left-24">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white">
-                  <span className="text-xl font-bold text-slate-900">P</span>
+                  <span className="text-xl font-bold text-slate-900">S</span>
               </div>
               <h1 className="text-xl font-bold tracking-tighter text-slate-900">
-                  Prep
+                  StudyPrep
               </h1>
           </div>
 
@@ -68,7 +68,7 @@ export default function AuthPage() {
             Hi there
           </h2>
           <p className="mt-4 text-slate-600 ">
-            Welcome to Prep. AI-Powered Study Dashboard
+            Welcome to StudyPrep. AI-Powered Study Dashboard
           </p>
           {/* Google Sign In Button */}
           <button
