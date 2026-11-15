@@ -48,10 +48,7 @@ export default async function LandingPage() {
                               "linear-gradient(to bottom right, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.7))",
                       }}
                   />
-
-                  {/* Your content: needs to sit above the layers */}
                   <div style={{ position: "relative", zIndex: 1 }}>
-                      {/* hero content here */}
                   </div>
               </section>
 
