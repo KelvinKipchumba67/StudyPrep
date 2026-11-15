@@ -118,3 +118,12 @@ html, body {
     display: none;
   }
 }
+.app-sidebar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .app-sidebar {
+    display: flex;
+  }
+}
