@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { SquareStack, LayoutGrid, Sparkles, ChevronDown, Search, Trash2 } from "lucide-react";
+import { SquareStack, LayoutGrid, Sparkles, ChevronDown, Search, Trash2, Upload } from "lucide-react";
 import MobileNav from "@/app/components/MobileNav";
 import ConfirmDialog from "@/app/components/ConfirmDialog";
 import AppShell from "@/app/components/AppShell";
@@ -142,6 +142,36 @@ function DeckSection({
 function FlashcardForm({ onCreated }: { onCreated: (deck: Deck) => void }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [notes, setNotes] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const [fileName, setFileName] = useState("");
+
+    async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        e.target.value = ""; // lets you pick the same file again later
+        if (!file) return;
+
+        setUploading(true);
+        setError("");
+        try {
+            const fd = new FormData();
+            fd.append("file", file);
+            const res = await fetch("/api/extract", {
+                method: "POST",
+                credentials: "include",
+                body: fd,
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            setNotes(data.text);
+            setFileName(data.fileName);
+        } catch (err: any) {
+            setError(err.message || "Failed to read the file.");
+        } finally {
+            setUploading(false);
+        }
+    }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -156,7 +186,7 @@ function FlashcardForm({ onCreated }: { onCreated: (deck: Deck) => void }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     subject: fd.get("subject"),
-                    notes: fd.get("notes"),
+                    notes,
                     count: Number(fd.get("count")),
                 }),
             });
@@ -189,16 +219,41 @@ function FlashcardForm({ onCreated }: { onCreated: (deck: Deck) => void }) {
                 </div>
 
                 <div>
-                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                        Topics or notes
-                    </label>
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                        <label className="block text-sm font-medium text-slate-700">
+                            Topics or notes
+                        </label>
+                        <label
+                            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                            style={{ opacity: uploading ? 0.6 : 1 }}
+                        >
+                            <Upload size={13} />
+                            {uploading ? "Reading..." : "Upload file"}
+                            <input
+                                type="file"
+                                accept=".pdf,.docx,.txt,.md"
+                                onChange={handleFile}
+                                disabled={uploading}
+                                style={{ display: "none" }}
+                            />
+                        </label>
+                    </div>
+
                     <textarea
                         name="notes"
                         rows={4}
                         required
-                        placeholder="Paste your notes, or list topics: Trees, Graphs, Big-O..."
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Paste your notes, list topics, or upload a PDF, DOCX or TXT file..."
                         className={`${inputClass} resize-none`}
                     />
+
+                    {fileName && (
+                        <p className="mt-1.5 text-xs text-slate-500">
+                            Loaded from <b>{fileName}</b>. Only the first 15,000 characters are used.
+                        </p>
+                    )}
                 </div>
 
                 <div>
@@ -217,7 +272,7 @@ function FlashcardForm({ onCreated }: { onCreated: (deck: Deck) => void }) {
 
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || uploading}
                     className="mt-2 w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98] disabled:opacity-60"
                 >
                     {loading ? "Generating..." : "Generate Flashcards"}
