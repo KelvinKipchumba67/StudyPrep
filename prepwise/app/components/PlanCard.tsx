@@ -1,6 +1,8 @@
-import { BookOpen } from "lucide-react";
+import { BookOpen, Trash2 } from "lucide-react";
 
-export default function PlanCard({ plan }: { plan: any }) {
+export default function PlanCard({ plan, onDelete }: { plan: any;
+    onDelete?: () => void;
+}) {
     const normalizedPlan = plan?.schedule ? plan.schedule : plan;
     const planDays = normalizedPlan?.days || [];
 
@@ -16,9 +18,21 @@ export default function PlanCard({ plan }: { plan: any }) {
                         {normalizedPlan?.title || "Study Plan"}
                     </h2>
                 </div>
-                <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-          {planDays.length} {planDays.length === 1 ? "day" : "days"}
-        </span>
+                <div className="flex shrink-0 items-center gap-2">
+  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+    {planDays.length} {planDays.length === 1 ? "day" : "days"}
+  </span>
+                    {onDelete && (
+                        <button
+                            type="button"
+                            onClick={onDelete}
+                            aria-label="Delete plan"
+                            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        >
+                            <Trash2 size={16} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Day cards */}
