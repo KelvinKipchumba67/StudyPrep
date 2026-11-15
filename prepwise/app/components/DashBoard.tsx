@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Home } from "lucide-react";
 import { SquareStack } from "lucide-react";
 import MobileNav from "@/app/components/MobileNav";
+import ConfirmDialog from "@/app/components/ConfirmDialog";
 const DOT_COLORS = [
   "bg-pink-400",
   "bg-emerald-400",
@@ -27,6 +28,8 @@ export default function DashboardClient({
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
+  const [planToDelete, setPlanToDelete] = useState<any | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   // set on the client only to avoid hydration mismatch
@@ -67,23 +70,28 @@ export default function DashboardClient({
     }
   };
 
-  const handleDeletePlan = async (id: string) => {
-    if (!window.confirm("Delete this study plan? This can't be undone.")) return;
+  const confirmDeletePlan = async () => {
+    if (!planToDelete) return;
+    setDeleting(true);
 
     try {
-      const res = await fetch(`/api/plans/${id}`, {
+      const res = await fetch(`/api/plans/${planToDelete.id}`, {
         method: "DELETE",
         credentials: "include",
       });
       if (!res.ok) throw new Error();
 
-      const next = plans.filter((p) => p.id !== id);
+      const next = plans.filter((p) => p.id !== planToDelete.id);
       setPlans(next);
+
       if (selectedSubject !== "All" && !next.some((p) => p.subject === selectedSubject)) {
         setSelectedSubject("All");
       }
+      setPlanToDelete(null);
     } catch {
       alert("Couldn't delete the plan. Please try again.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -297,7 +305,7 @@ export default function DashboardClient({
                             <PlanCard
                                 key={plan.id || index}
                                 plan={plan}
-                                onDelete={plan.id ? () => handleDeletePlan(plan.id) : undefined}
+                                onDelete={plan.id ? () => setPlanToDelete(plan) : undefined}
                             />
                         ))}
                         {visiblePlans.length === 0 && (
@@ -312,6 +320,16 @@ export default function DashboardClient({
             </div>
           </div>
         </div>
+        <ConfirmDialog
+            open={!!planToDelete}
+            title="Delete study plan"
+            description={`This will permanently delete the ${planToDelete?.subject ?? ""} study plan and its schedule.`}
+            confirmWord="delete"
+            warning="This cannot be undone."
+            loading={deleting}
+            onCancel={() => setPlanToDelete(null)}
+            onConfirm={confirmDeletePlan}
+        />
         <MobileNav />
       </div>
   );
