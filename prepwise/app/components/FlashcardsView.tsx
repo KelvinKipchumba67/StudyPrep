@@ -4,6 +4,7 @@ import { SquareStack, LayoutGrid, Sparkles, ChevronDown, Search, Trash2 } from "
 import MobileNav from "@/app/components/MobileNav";
 import ConfirmDialog from "@/app/components/ConfirmDialog";
 import AppShell from "@/app/components/AppShell";
+import { useRouter } from "next/navigation";
 
 type Card = { front: string; back: string };
 export type Deck = {
@@ -238,6 +239,18 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
     const [deckToDelete, setDeckToDelete] = useState<Deck | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            await fetch("/api/auth?action=logout", { method: "POST" });
+            router.push("/");
+            router.refresh();
+        } catch (error) {
+            console.error("Failed to logout:", error);
+        }
+    };
+
     useEffect(() => {
         setToday(
             new Date().toLocaleDateString("en-US", {
@@ -332,14 +345,24 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
         >
             <div className="min-h-screen bg-[#F8F9FA] p-8" style={{ paddingBottom: 100 }}>
                 {/* Search */}
-                <div className="mb-6 flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2">
-                    <Search size={15} className="text-slate-400" />
-                    <input
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search your flashcards"
-                        className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                    />
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+                    <div className="flex flex-1 items-center gap-2 rounded-lg bg-slate-100 px-3 py-2">
+                        <Search size={15} className="text-slate-400" />
+                        <input
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Search your flashcards"
+                            className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="mobile-logout rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        style={{ flexShrink: 0 }}
+                    >
+                        Log out
+                    </button>
                 </div>
 
                 {/* Header */}
