@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         }
 
         const cardCount = Math.min(Math.max(Number(count) || 10, 5), 30);
-        const source = notes.trim().slice(0, 8000);
+        const source = notes.trim().slice(0, 15000);
         const completion = await groq.chat.completions.create({
             model: "openai/gpt-oss-20b",
             response_format: { type: "json_object" },
