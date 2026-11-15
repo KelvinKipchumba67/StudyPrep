@@ -94,10 +94,10 @@ export default function DashboardClient({
           <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 p-5 md:flex">
             <Link href="/" className="mb-8 flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-sm font-bold text-slate-900">
-                P
+                S
               </div>
               <span className="font-serif text-xl font-semibold text-slate-900">
-    Prep
+    StudyPrep
   </span>
             </Link>
 
