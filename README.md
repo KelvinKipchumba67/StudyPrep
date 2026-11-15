@@ -15,7 +15,7 @@ Turn your subject, topics and exam date into a day-by-day revision plan, and tur
 
 ---
 
-![PrepWise flashcard dashboard](./prepwise/public/assets/images/dash.png)
+![PrepWise flashcard dashboard](./prepwise/public/assets/images/flashcard.png)
 
 
 ---
