@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SquareStack, LayoutGrid, Sparkles, ChevronDown, Search, Trash2 } from "lucide-react";
 import MobileNav from "@/app/components/MobileNav";
 import ConfirmDialog from "@/app/components/ConfirmDialog";
+import AppShell from "@/app/components/AppShell";
 
 type Card = { front: string; back: string };
 export type Deck = {
@@ -233,6 +234,7 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
     const [decks, setDecks] = useState<Deck[]>(initialDecks);
     const [today, setToday] = useState("");
     const [query, setQuery] = useState("");
+    const [selectedSubject, setSelectedSubject] = useState("All");
     const [deckToDelete, setDeckToDelete] = useState<Deck | null>(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -245,8 +247,13 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
             })
         );
     }, []);
+    const subjects: string[] = [];
+    decks.forEach((d) => {
+        const s = d.subject.trim();
+        if (s && !subjects.some((x) => x.toLowerCase() === s.toLowerCase())) subjects.push(s);
+    });
 
-    const subjectCount = new Set(decks.map((d) => d.subject.trim().toLowerCase())).size;
+    const subjectCount = subjects.length;
 
     const confirmDeleteDeck = async () => {
         if (!deckToDelete) return;
@@ -259,8 +266,15 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
             });
             if (!res.ok) throw new Error();
 
-            setDecks((prev) => prev.filter((d) => d.id !== deckToDelete.id));
+            const remaining = decks.filter((d) => d.id !== deckToDelete.id);
+            setDecks(remaining);
             setDeckToDelete(null);
+            if (
+                selectedSubject !== "All" &&
+                !remaining.some((d) => d.subject.trim().toLowerCase() === selectedSubject.toLowerCase())
+            ) {
+                setSelectedSubject("All");
+            }
         } catch {
             alert("Couldn't delete the deck. Please try again.");
         } finally {
@@ -293,6 +307,11 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
 
     const q = query.trim().toLowerCase();
     const visibleDecks = decks
+        .filter(
+            (d) =>
+                selectedSubject === "All" ||
+                d.subject.trim().toLowerCase() === selectedSubject.toLowerCase()
+        )
         .map((d) => {
             const deckMatches = `${d.title} ${d.subject}`.toLowerCase().includes(q);
             const cards = d.cards
@@ -306,92 +325,100 @@ export default function FlashcardsView({ initialDecks }: { initialDecks: Deck[] 
         .filter((x) => x.cards.length > 0);
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] p-8" style={{ paddingBottom: 100 }}>
-            {/* Search */}
-            <div className="mb-6 flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2">
-                <Search size={15} className="text-slate-400" />
-                <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search your flashcards"
-                    className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                />
-            </div>
-
-            {/* Header */}
-            <header>
-                <p className="min-h-[20px] text-sm text-slate-500">{today}</p>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900">Flashcards</h1>
-                <p className="mt-1 text-slate-600">
-                    Paste your notes and let Prep turn them into flashcards.
-                </p>
-            </header>
-
-            {/* Stats pill */}
-            <div className="mt-6 inline-flex items-center gap-5 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">
-                <span className="flex items-center gap-2">
-                    <SquareStack size={15} className="text-slate-500" />
-                    <b className="text-slate-900">{decks.length}</b> Decks generated
-                </span>
-                <span className="flex items-center gap-2">
-                    <LayoutGrid size={15} className="text-slate-500" />
-                    <b className="text-slate-900">{subjectCount}</b> Subjects
-                </span>
-            </div>
-
-            {/* Two columns */}
-            <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-1">
-                    <FlashcardForm onCreated={(deck) => setDecks((prev) => [deck, ...prev])} />
+        <AppShell
+            subjects={subjects}
+            selectedSubject={selectedSubject}
+            onSelectSubject={setSelectedSubject}
+        >
+            <div className="min-h-screen bg-[#F8F9FA] p-8" style={{ paddingBottom: 100 }}>
+                {/* Search */}
+                <div className="mb-6 flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2">
+                    <Search size={15} className="text-slate-400" />
+                    <input
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Search your flashcards"
+                        className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                    />
                 </div>
 
-                <div className="min-w-0 space-y-5 lg:col-span-2">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-base font-bold text-slate-900">All Decks</h2>
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                            {visibleDecks.length} {visibleDecks.length === 1 ? "deck" : "decks"}
-                        </span>
+                {/* Header */}
+                <header>
+                    <p className="min-h-[20px] text-sm text-slate-500">{today}</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Flashcards</h1>
+                    <p className="mt-1 text-slate-600">
+                        Paste your notes and let Prep turn them into flashcards.
+                    </p>
+                </header>
+
+                {/* Stats pill */}
+                <div className="mt-6 inline-flex items-center gap-5 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-600">
+                    <span className="flex items-center gap-2">
+                        <SquareStack size={15} className="text-slate-500" />
+                        <b className="text-slate-900">{decks.length}</b> Decks generated
+                    </span>
+                    <span className="flex items-center gap-2">
+                        <LayoutGrid size={15} className="text-slate-500" />
+                        <b className="text-slate-900">{subjectCount}</b> Subjects
+                    </span>
+                </div>
+
+                {/* Two columns */}
+                <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <div className="lg:col-span-1">
+                        <FlashcardForm onCreated={(deck) => setDecks((prev) => [deck, ...prev])} />
                     </div>
 
-                    {decks.length === 0 ? (
-                        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white/50 text-center">
-                            <h3 className="text-lg font-semibold text-slate-900">No decks yet</h3>
-                            <p className="mt-1 text-sm text-slate-500">
-                                Generate your first flashcard deck to see it here.
-                            </p>
+                    <div className="min-w-0 space-y-5 lg:col-span-2">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-base font-bold text-slate-900">
+                                {selectedSubject === "All" ? "All Decks" : selectedSubject}
+                            </h2>
+                            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                                {visibleDecks.length} {visibleDecks.length === 1 ? "deck" : "decks"}
+                            </span>
                         </div>
-                    ) : visibleDecks.length === 0 ? (
-                        <p className="py-10 text-center text-sm text-slate-500">
-                            No decks match your search.
-                        </p>
-                    ) : (
-                        visibleDecks.map(({ deck, cards }, i) => (
-                            <DeckSection
-                                key={deck.id}
-                                deck={deck}
-                                cards={cards}
-                                defaultOpen={i === 0}
-                                searching={q !== ""}
-                                onDelete={() => setDeckToDelete(deck)}
-                                onDeleteCard={(index) => handleDeleteCard(deck.id, index)}
-                            />
-                        ))
-                    )}
+
+                        {decks.length === 0 ? (
+                            <div className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white/50 text-center">
+                                <h3 className="text-lg font-semibold text-slate-900">No decks yet</h3>
+                                <p className="mt-1 text-sm text-slate-500">
+                                    Generate your first flashcard deck to see it here.
+                                </p>
+                            </div>
+                        ) : visibleDecks.length === 0 ? (
+                            <p className="py-10 text-center text-sm text-slate-500">
+                                No decks match your search.
+                            </p>
+                        ) : (
+                            visibleDecks.map(({ deck, cards }, i) => (
+                                <DeckSection
+                                    key={deck.id}
+                                    deck={deck}
+                                    cards={cards}
+                                    defaultOpen={i === 0}
+                                    searching={q !== ""}
+                                    onDelete={() => setDeckToDelete(deck)}
+                                    onDeleteCard={(index) => handleDeleteCard(deck.id, index)}
+                                />
+                            ))
+                        )}
+                    </div>
                 </div>
+
+                <ConfirmDialog
+                    open={!!deckToDelete}
+                    title="Delete flashcard deck"
+                    description={`This will permanently delete "${deckToDelete?.title ?? ""}" and all its cards.`}
+                    confirmWord="delete"
+                    warning="This cannot be undone."
+                    loading={deleting}
+                    onCancel={() => setDeckToDelete(null)}
+                    onConfirm={confirmDeleteDeck}
+                />
+
+                <MobileNav />
             </div>
-
-            <ConfirmDialog
-                open={!!deckToDelete}
-                title="Delete flashcard deck"
-                description={`This will permanently delete "${deckToDelete?.title ?? ""}" and all its cards.`}
-                confirmWord="delete"
-                warning="This cannot be undone."
-                loading={deleting}
-                onCancel={() => setDeckToDelete(null)}
-                onConfirm={confirmDeleteDeck}
-            />
-
-            <MobileNav />
-        </div>
+        </AppShell>
     );
 }
