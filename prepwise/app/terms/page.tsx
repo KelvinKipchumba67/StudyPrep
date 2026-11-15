@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import LegalPage from "@/app/components/legalPage";
 
-export const metadata: Metadata = { title: "Terms of Service | Prep" };
+export const metadata: Metadata = { title: "Terms of Service | StudyPrep" };
 
 export default function TermsPage() {
     return (
         <LegalPage
             title="Terms of Service"
             updated="October 24, 2026"
-            intro="By creating an account or using Prep, you agree to these terms. If you don't agree, please don't use the service."
+            intro="By creating an account or using StudyPrep, you agree to these terms. If you don't agree, please don't use the service."
             sections={[
                 {
                     heading: "The service",
                     body: [
-                        "Prep generates personalized study schedules from the subject, topics, and exam date you provide, and lets you save and revisit them.",
+                        "StudyPrep generates personalized study schedules from the subject, topics, and exam date you provide, and lets you save and revisit them.",
                     ],
                 },
                 {
@@ -26,7 +26,7 @@ export default function TermsPage() {
                     heading: "Acceptable use",
                     body: ["You agree not to:"],
                     list: [
-                        "Use Prep for anything unlawful or harmful.",
+                        "Use StudyPrep for anything unlawful or harmful.",
                         "Attempt to break, overload, or gain unauthorized access to the service.",
                         "Submit content that infringes others' rights or contains malicious code.",
                     ],
@@ -46,7 +46,7 @@ export default function TermsPage() {
                 {
                     heading: "Our property",
                     body: [
-                        "The Prep name, design, and software belong to us. You may not copy or resell them without permission.",
+                        "The StudyPrep name, design, and software belong to us. You may not copy or resell them without permission.",
                     ],
                 },
                 {
@@ -58,19 +58,19 @@ export default function TermsPage() {
                 {
                     heading: "Termination",
                     body: [
-                        "You can stop using Prep at any time. We may suspend or close accounts that break these terms.",
+                        "You can stop using StudyPrep at any time. We may suspend or close accounts that break these terms.",
                     ],
                 },
                 {
                     heading: "Disclaimer and liability",
                     body: [
-                        "Prep is provided \"as is\" without warranties. To the extent the law allows, we aren't liable for indirect or consequential losses arising from your use of the service.",
+                        "StudyPrep is provided \"as is\" without warranties. To the extent the law allows, we aren't liable for indirect or consequential losses arising from your use of the service.",
                     ],
                 },
                 {
                     heading: "Changes to these terms",
                     body: [
-                        "We may update these terms. Continuing to use Prep after a change means you accept the new version.",
+                        "We may update these terms. Continuing to use StudyPrep after a change means you accept the new version.",
                     ],
                 },
                 {
