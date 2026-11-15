@@ -67,6 +67,26 @@ export default function DashboardClient({
     }
   };
 
+  const handleDeletePlan = async (id: string) => {
+    if (!window.confirm("Delete this study plan? This can't be undone.")) return;
+
+    try {
+      const res = await fetch(`/api/plans/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error();
+
+      const next = plans.filter((p) => p.id !== id);
+      setPlans(next);
+      if (selectedSubject !== "All" && !next.some((p) => p.subject === selectedSubject)) {
+        setSelectedSubject("All");
+      }
+    } catch {
+      alert("Couldn't delete the plan. Please try again.");
+    }
+  };
+
   const visiblePlans = plans.filter((plan) => {
     const matchesSubject =
         selectedSubject === "All" || plan.subject === selectedSubject;
@@ -274,7 +294,11 @@ export default function DashboardClient({
                   {plans.length > 0 && (
                       <div className="grid grid-cols-1 gap-5">
                         {visiblePlans.map((plan, index) => (
-                            <PlanCard key={plan.id || index} plan={plan} />
+                            <PlanCard
+                                key={plan.id || index}
+                                plan={plan}
+                                onDelete={plan.id ? () => handleDeletePlan(plan.id) : undefined}
+                            />
                         ))}
                         {visiblePlans.length === 0 && (
                             <p className="py-10 text-center text-sm text-slate-500">
