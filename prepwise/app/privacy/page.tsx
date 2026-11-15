@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import LegalPage from "@/app/components/legalPage";
 
-export const metadata: Metadata = { title: "Privacy Policy | Prep" };
+export const metadata: Metadata = { title: "Privacy Policy | StudyPrep" };
 
 export default function PrivacyPage() {
     return (
         <LegalPage
             title="Privacy Policy"
             updated="October 24, 2026"
-            intro="Prep is an AI-powered study planner. This policy explains what information we collect, how we use it, and the choices you have."
+            intro="StudyPrep is an AI-powered study planner. This policy explains what information we collect, how we use it, and the choices you have."
             sections={[
                 {
                     heading: "Information we collect",
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
                 {
                     heading: "Sharing your information",
                     body: [
-                        "We don't sell your personal information. We share data only with service providers that help us run Prep (such as hosting, database, and AI providers), or when the law requires it.",
+                        "We don't sell your personal information. We share data only with service providers that help us run StudyPrep (such as hosting, database, and AI providers), or when the law requires it.",
                     ],
                 },
                 {
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
                 {
                     heading: "Children",
                     body: [
-                        "Prep is intended for students who can agree to these terms under their local law. If you're a parent and believe your child has given us information, contact us and we'll remove it.",
+                        "StudyPrep is intended for students who can agree to these terms under their local law. If you're a parent and believe your child has given us information, contact us and we'll remove it.",
                     ],
                 },
                 {
