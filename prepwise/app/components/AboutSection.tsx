@@ -6,6 +6,7 @@ import {
     BookmarkCheck,
     CalendarClock,
     Sparkles,
+    SquareStack,
     MousePointerClick,
 } from "lucide-react";
 
@@ -19,6 +20,11 @@ const features = [
         icon: CalendarClock,
         title: "Exam-Focused Planning",
         text: "Build timelines backward from your exam date for efficient preparation.",
+    },
+    {
+        icon: SquareStack,
+        title: "Generate flashcards",
+        text: "Create custom flashcards tailored to your topics and notes",
     },
     {
         icon: BookmarkCheck,
@@ -38,6 +44,7 @@ const steps = [
     "Set your exam date",
     "Prep generates a structured, personalized study plan",
     "Save and revisit your plan anytime",
+    "Go to flashcard from the Dashboard, Enter the subject, topics or your notes and the number of flashcards to create flashcards",
 ];
 
 export default function AboutSection({
