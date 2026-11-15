@@ -12,10 +12,10 @@ export default function PrepWiseNavbar({ showLogout = false }: NavbarProps) {
             <nav className="flex w-full items-center justify-between px-6 py-4 lg:px-10">
                 <Link href="/" className="flex items-center gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white">
-                        <span className="text-xl font-bold text-slate-900">P</span>
+                        <span className="text-xl font-bold text-slate-900">S</span>
                     </div>
                     <span className="text-xl font-bold tracking-tight text-slate-900">
-                        Prep
+                        StudyPrep
                     </span>
                 </Link>
 
