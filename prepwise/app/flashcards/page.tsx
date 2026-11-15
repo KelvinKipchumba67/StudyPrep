@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { verifyToken, cookieOptions } from "@/lib/auth";
 import FlashcardsView from "@/app/components/FlashcardsView";
+import AppShell from "@/app/components/AppShell";
 
 export default async function FlashcardsPage() {
     const cookieStore = await cookies();
