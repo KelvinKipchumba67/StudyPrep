@@ -41,7 +41,7 @@ Turn your subject, topics and exam date into a day-by-day revision plan, and tur
 
 ## Overview
 
-Students often know *what* they need to study but not *how to spread it* across the time they have left. PrepWise closes that gap. You enter a subject, the topics you need to cover and your exam date, and it builds a realistic schedule that fits the days you actually have. A 2-day crash course and a 3-week plan look very different, and PrepWise plans for both.
+Students often know *what* they need to study but not *how to spread it* across the time they have left. StudyPrep closes that gap. You enter a subject, the topics you need to cover and your exam date, and it builds a realistic schedule that fits the days you actually have. A 2-day crash course and a 3-week plan look very different, and StudyPrep plans for both.
 
 It also generates flashcards from your own notes or uploaded documents, so revision material is ready in seconds.
 
