@@ -169,7 +169,7 @@ export default function HelpSection() {
                                     fontSize: 14,
                                 }}
                             >
-                                Thanks! Your message has been sent. We&apos;ll get back to you soon.
+                                Thanks Your message has been sent. We&apos;ll get back to you soon.
                             </p>
                         )}
 
