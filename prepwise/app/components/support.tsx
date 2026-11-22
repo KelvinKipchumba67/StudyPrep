@@ -1,133 +1,196 @@
-'use client'
+"use client";
 import { useState } from "react";
-export default function SupportPage() {
-    const [formData, setFormData] = useState({
-        name: "", school: "", email: "", phone: "", message: ""
-    });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+const labelStyle: React.CSSProperties = {
+    display: "block",
+    marginBottom: 6,
+    fontSize: 14,
+    fontWeight: 500,
+    color: "#334155",
+};
 
-    const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+export default function HelpSection() {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [message, setMessage] = useState("");
+    const [website, setWebsite] = useState(""); // honeypot, stays empty for real users
+    const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+    const [error, setError] = useState("");
 
-    const handleSubmit = async () => {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
         setStatus("sending");
+        setError("");
+
         try {
             const res = await fetch("/api/contact", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ name, email, message, website }),
             });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
 
-            if (res.ok) {
-                setStatus("success");
-                setFormData({ name: "", school: "", email: "", phone: "", message: "" });
-            } else {
-                setStatus("error");
-            }
-        } catch {
+            setStatus("sent");
+            setName("");
+            setEmail("");
+            setMessage("");
+        } catch (err: any) {
+            setError(err.message || "Something went wrong. Please try again.");
             setStatus("error");
         }
-    };
-
-    const inputStyle: React.CSSProperties = {
-        backgroundColor: "transparent",
-        border: "none",
-        borderBottom: "1px solid #4a5568",
-        color: "#ffffff",
-        fontSize: "1rem",
-        padding: "0.5rem 0",
-        width: "100%",
-        outline: "none",
-    };
-
-    const labelStyle: React.CSSProperties = {
-        color: "#ffffff",
-        fontSize: "0.875rem",
-        fontWeight: 700,
-        marginBottom: "0.5rem",
-        display: "block",
-    };
+    }
 
     return (
-        <>
-            <div style={{ backgroundColor: "#0a1a0a", minHeight: "100vh", paddingTop: "140px", paddingBottom: "4rem" }}>
-                <div style={{ maxWidth: "960px", margin: "0 auto", padding: "0 2rem" }}>
-                    <h2 style={{ fontSize: "2.5rem", fontWeight: 700, color: "#ffffff", marginBottom: "0.5rem" }}>
-                        Reach Out{" "}
-                        <span style={{ color: "#4a7c59" }}>for</span>{" "}
-                        <span style={{ color: "#4a7c59" }}>Help</span>
-                    </h2>
-                    <h3 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#ffffff", marginBottom: "2.5rem" }}>
-                        We're Here
-                    </h3>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-                        <div className="form-row" style={{ display: "flex", gap: "2rem" }}>
-                            <div style={{ flex: 1 }}>
-                                <label style={labelStyle}>Your Name</label>
-                                <input name="name" placeholder="Name Here" style={inputStyle} onChange={handleChange} />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <label style={labelStyle}>Your School</label>
-                                <input name="school" placeholder="School Name" style={inputStyle} onChange={handleChange} />
-                            </div>
-                        </div>
-                        <div className="form-row" style={{ display: "flex", gap: "2rem" }}>
-                            <div style={{ flex: 1 }}>
-                                <label style={labelStyle}>Email Address</label>
-                                <input name="email" type="email" placeholder="Email Here" style={inputStyle} onChange={handleChange} />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <label style={labelStyle}>Phone Number</label>
-                                <input name="phone" type="tel" placeholder="Phone Here" style={inputStyle} onChange={handleChange} />
-                            </div>
-                        </div>
+        <div style={{ background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
+            <div className="sp-section">
+                <div style={{ maxWidth: 640, margin: "0 auto" }}>
+                    <div style={{ marginBottom: 40 }}>
+                        <span
+                            style={{
+                                display: "inline-block",
+                                background: "#eff6ff",
+                                color: "#1d4ed8",
+                                borderRadius: 9999,
+                                padding: "5px 12px",
+                                fontSize: 11,
+                                fontWeight: 700,
+                                letterSpacing: "0.08em",
+                                textTransform: "uppercase",
+                            }}
+                        >
+                            Support
+                        </span>
+                        <h2
+                            style={{
+                                margin: "14px 0 6px",
+                                fontSize: 32,
+                                fontWeight: 800,
+                                letterSpacing: "-0.02em",
+                                color: "#0f172a",
+                            }}
+                        >
+                            Get in touch
+                        </h2>
+                        <p style={{ margin: 0, fontSize: 15, color: "#475569", lineHeight: 1.6 }}>
+                            Found a bug, have feedback, or need help? Send us a message.
+                        </p>
+                    </div>
+
+                    <form
+                        onSubmit={handleSubmit}
+                        style={{
+                            background: "#fff",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: 16,
+                            padding: 36,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 24,
+                        }}
+                    >
+                        <input
+                            type="text"
+                            name="website"
+                            value={website}
+                            onChange={(e) => setWebsite(e.target.value)}
+                            tabIndex={-1}
+                            autoComplete="off"
+                            aria-hidden="true"
+                            style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, width: 0 }}
+                        />
+
                         <div>
-                            <label style={labelStyle}>Your Message</label>
-                            <textarea
-                                name="message"
-                                placeholder="Message Here"
-                                rows={4}
-                                style={{ ...inputStyle, resize: "vertical" }}
-                                onChange={handleChange}
+                            <label style={labelStyle}>Your name</label>
+                            <input
+                                className="sp-input"
+                                required
+                                maxLength={100}
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Your name"
                             />
                         </div>
+
                         <div>
+                            <label style={labelStyle}>Email address</label>
+                            <input
+                                className="sp-input"
+                                type="email"
+                                required
+                                maxLength={200}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="you@example.com"
+                            />
+                        </div>
 
-                            {status === "success" && (
-                                <p style={{ color: "#4ade80", marginBottom: "1rem" }}>
-                                    Message sent successfully
-                                </p>
-                            )}
-                            {status === "error" && (
-                                <p style={{ color: "#f87171", marginBottom: "1rem" }}>
-                                    Failed to send. Please try again.
-                                </p>
-                            )}
+                        <div>
+                            <label style={labelStyle}>Message</label>
+                            <textarea
+                                className="sp-input"
+                                required
+                                rows={6}
+                                maxLength={3000}
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                placeholder="How can we help?"
+                                style={{ resize: "none" }}
+                            />
+                        </div>
 
+                        <button
+                            type="submit"
+                            disabled={status === "sending"}
+                            style={{
+                                background: "#2563eb",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: 10,
+                                padding: "12px 0",
+                                fontSize: 14,
+                                fontWeight: 600,
+                                cursor: status === "sending" ? "default" : "pointer",
+                                opacity: status === "sending" ? 0.6 : 1,
+                            }}
+                        >
+                            {status === "sending" ? "Sending..." : "Send message"}
+                        </button>
 
-                            <button
-                                onClick={handleSubmit}
-                                disabled={status === "sending"}
+                        {status === "sent" && (
+                            <p
                                 style={{
-                                    backgroundColor: "#3d6b4f",
-                                    color: "#ffffff",
-                                    border: "none",
-                                    padding: "0.875rem 3rem",
-                                    fontSize: "1rem",
-                                    fontWeight: 600,
-                                    cursor: status === "sending" ? "not-allowed" : "pointer",
-                                    opacity: status === "sending" ? 0.7 : 1,
-                                    transition: "background-color 0.2s ease, transform 0.2s ease",
+                                    margin: 0,
+                                    padding: "10px 14px",
+                                    borderRadius: 8,
+                                    background: "#eff6ff",
+                                    border: "1px solid #bfdbfe",
+                                    color: "#1d4ed8",
+                                    fontSize: 14,
                                 }}
                             >
-                                {status === "sending" ? "Sending..." : "Send Message"}
-                            </button>
-                        </div>
-                    </div>
+                                Thanks! Your message has been sent. We&apos;ll get back to you soon.
+                            </p>
+                        )}
+
+                        {status === "error" && (
+                            <p
+                                style={{
+                                    margin: 0,
+                                    padding: "10px 14px",
+                                    borderRadius: 8,
+                                    background: "#fef2f2",
+                                    border: "1px solid #fecaca",
+                                    color: "#b91c1c",
+                                    fontSize: 14,
+                                }}
+                            >
+                                {error}
+                            </p>
+                        )}
+                    </form>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
