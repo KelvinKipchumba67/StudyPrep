@@ -41,12 +41,15 @@
     .sp-grid-3, .sp-grid-2 { grid-template-columns: 1fr; }
 }
 
+
+/* contact: stop browser autofill from tinting the fields */
 .sp-input:-webkit-autofill,
 .sp-input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0 1000px #f8fafc inset;
     -webkit-text-fill-color: #0f172a;
 }
 
+/* footer */
 .sp-footer-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
